@@ -1,7 +1,7 @@
 {
   "name": "content-reports-react",
   "description": "A comprehensive content reporting tool for Jahia DX",
-  "version": "2.2.0",
+  "version": "2.2.1-SNAPSHOT",
   "scripts": {
     "test": "env-cmd --no-override jest",
     "testcli": "jest",
