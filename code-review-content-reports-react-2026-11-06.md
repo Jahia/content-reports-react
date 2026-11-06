@@ -148,6 +148,24 @@ to throws `PathNotFoundException`, logged as an ERROR and returned as a generic 
 
 **Effort:** XS
 
+### 3.5 Three reports read a resource bundle the module does not ship — 🟠 P1
+
+Reports 2, 6 and 24 call `Messages.get("resources.contentReportReact", ...)` (month names, status
+names, published / not published), and the module has no `src/main/resources/resources/`.
+
+`ReportByAllDate` (report 2, *By date*) always calls it and answers `Internal Server Error` with
+`MissingResourceException: Can't find bundle for base name resources.contentReportReact`
+(reproduced on 8.2.3.2). `ReportByStatus` (6) and `ReportContentMarkedForDeletion` (24) fail the same
+way as soon as they have a row to label; on a site without such content they return an empty table,
+so the defect hides.
+
+**Fix:** return the keys (`month.<n>`, `status.<name>`, `published`) and translate them in the UI
+from the existing locale JSON files, which already ship six languages; or ship
+`resources/contentReportReact*.properties` (ASCII, `\uXXXX` escapes) with the keys the three
+reports use.
+
+**Effort:** S
+
 ## 5. Build, Maven and OSGi packaging
 
 ### 5.1 The 2.1.0 release jar was built on a laptop — 🟡 P2
@@ -194,6 +212,7 @@ for an administrator. Unit tests for `ReportUsersAndGroupsGenerator#normalizeRoo
 | --- | --- | --- |
 | 🔴 P0 | Users and groups report: no permission, system-session export, write and delete in any site (§1.1) — fixed, unreleased | S |
 | 🟠 P1 | Reports ran on `systemsite` instead of the site open in jContent — fixed, unreleased (§3.1) | XS |
+| 🟠 P1 | Reports 2, 6 and 24 fail on a missing resource bundle (§3.5) | S |
 | 🟡 P2 | Request values concatenated into JCR-SQL2 (§1.2) | XS |
 | 🟡 P2 | Results silently cut at 1000 / 10000 rows (§3.2) | S |
 | 🟡 P2 | Release jar built locally, unsigned (§5.1) | S |

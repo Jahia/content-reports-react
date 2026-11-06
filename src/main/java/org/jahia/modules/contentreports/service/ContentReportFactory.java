@@ -82,14 +82,14 @@ public final class ContentReportFactory {
                 return new ReportByAuthor(
                         siteNode,
                         cleanPath(params.get("pathTxt")),
-                        isPages(params.get("typeSearch")) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT,
-                        isCreated(params.get("typeAuthor")) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE,
+                        contentTypeOf(params.get("typeSearch")),
+                        actionTypeOf(params.get("typeAuthor")),
                         true
                 );
             case "2":
                 return new ReportByAllDate(
                         siteNode,
-                        isCreated(params.get("typeAuthor")) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE,
+                        actionTypeOf(params.get("typeAuthor")),
                         cleanPath(params.get("pathTxt")),
                         true
                 );
@@ -130,14 +130,11 @@ public final class ContentReportFactory {
                 LOGGER.debug("pathTxt raw value: '{}'", params.get("pathTxt"));
                 LOGGER.debug("pathTxt cleaned value: '{}'", cleanPath(params.get("pathTxt")));
                 // Use typeAuthorSearch if typeAuthor is not provided (due to 5-parameter limit)
-                String typeAuthorValue = params.get("typeAuthor");
-                if (typeAuthorValue == null || typeAuthorValue.isEmpty()) {
-                    typeAuthorValue = params.getOrDefault("typeAuthorSearch", "created");
-                }
+                String typeAuthorValue = StringUtils.defaultIfEmpty(params.get("typeAuthor"), params.getOrDefault("typeAuthorSearch", "created"));
                 LOGGER.debug("Using typeAuthor value: '{}'", typeAuthorValue);
                 return new ReportByDateAndAuthor(
                         siteNode,
-                        isCreated(typeAuthorValue) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE,
+                        actionTypeOf(typeAuthorValue),
                         cleanPath(params.get("pathTxt")),
                         params.getOrDefault("typeSearch", "pages"),
                         true,
@@ -162,7 +159,7 @@ public final class ContentReportFactory {
                 return new ReportWipContent(
                         siteNode,
                         cleanPath(params.get("pathTxt")),
-                        isPages(params.get("typeSearch")) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT,
+                        contentTypeOf(params.get("typeSearch")),
                         sortCol,
                         order
                 );
@@ -176,7 +173,7 @@ public final class ContentReportFactory {
                 return new ReportContentMarkedForDeletion(
                         siteNode,
                         cleanPath(params.get("pathTxt")),
-                        isPages(params.get("typeSearch")) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT,
+                        contentTypeOf(params.get("typeSearch")),
                         sortCol,
                         order
                 );
@@ -188,6 +185,14 @@ public final class ContentReportFactory {
             default:
                 throw new ContentReportException("Invalid reportId: " + reportId);
         }
+    }
+
+    private static BaseReport.SearchContentType contentTypeOf(String typeSearch) {
+        return isPages(typeSearch) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT;
+    }
+
+    private static BaseReport.SearchActionType actionTypeOf(String typeAuthor) {
+        return isCreated(typeAuthor) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE;
     }
 
     private static boolean isPages(String value) {
