@@ -56,6 +56,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * BaseReport Interface.
@@ -135,6 +137,38 @@ public abstract class BaseReport {
         jsonObject.put("siteDisplayableName", siteNode.getDisplayableName());
         jsonObject.put("data", data);
         return jsonObject;
+    }
+
+    /** Labels the reports write into their results: {@code resources/contentReportReact*.properties}. */
+    public static final String LABELS_BUNDLE = "resources.contentReportReact";
+
+    /**
+     * A label of this module in the report language, read with the module's own class loader
+     * (Jahia's {@code Messages.get(String, ...)} looks for the bundle elsewhere and failed on every
+     * call). A language without a file falls back to the English base file, never to the server's
+     * default locale.
+     *
+     * @param key the key in the bundle
+     * @return the label, or the key itself when it is missing
+     */
+    protected String label(String key) {
+        return label(key, locale);
+    }
+
+    /**
+     * {@link #label(String)} for a given locale.
+     *
+     * @param key    the key in the bundle
+     * @param locale the language of the label
+     * @return the label, or the key itself when it is missing
+     */
+    public static String label(String key, Locale locale) {
+        try {
+            return ResourceBundle.getBundle(LABELS_BUNDLE, locale, BaseReport.class.getClassLoader(),
+                    ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_PROPERTIES)).getString(key);
+        } catch (MissingResourceException e) {
+            return key;
+        }
     }
 
     public abstract void execute(JCRSessionWrapper session, int offset, int limit) throws RepositoryException, JSONException, JahiaException;

@@ -50,7 +50,6 @@ import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
-import org.jahia.utils.i18n.Messages;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,7 +68,6 @@ import java.util.stream.Stream;
  */
 public class ReportContentMarkedForDeletion extends QueryReport {
     private static Logger logger = LoggerFactory.getLogger(ReportLockedContent.class);
-    protected static final String BUNDLE = "resources.contentReportReact";
     private long totalContent;
     private int sortCol;
     private String searchPath;
@@ -187,9 +185,9 @@ public class ReportContentMarkedForDeletion extends QueryReport {
         String publishStatus;
         try {
             if (node.hasProperty("j:published") && node.getProperty("j:published").getValue().getBoolean()) {
-                publishStatus = Messages.get(BUNDLE, "cgnt_contentReports.status.published", locale);
+                publishStatus = label("cgnt_contentReports.status.published");
             } else {
-                publishStatus = Messages.get(BUNDLE, "cgnt_contentReports.status.notPublished", locale);
+                publishStatus = label("cgnt_contentReports.status.notPublished");
             }
         } catch (RepositoryException e) {
             logger.error("getPublicationStatusOfANode: problem while getting the publish status for the node " + node.getName(), e);

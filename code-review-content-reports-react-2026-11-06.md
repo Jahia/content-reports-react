@@ -166,6 +166,13 @@ reports use.
 
 **Effort:** S
 
+**Status (2026-11-06):** fixed, unreleased. Report 2 takes month names from
+`Month#getDisplayName` in the report language; reports 6 and 24 read their labels through
+`BaseReport#label`, which loads `resources/contentReportReact*.properties` (en base, fr, de, es, it, pt)
+with the module's class loader and no fallback to the server locale. `ReportLabelsTest` checks every
+key in every file, ASCII content, and the fallback (its mutant, the default fallback, fails it). Not
+yet run on a Jahia instance (the local one was stopped).
+
 ## 5. Build, Maven and OSGi packaging
 
 ### 5.1 The 2.1.0 release jar was built on a laptop — 🟡 P2
@@ -212,7 +219,7 @@ for an administrator. Unit tests for `ReportUsersAndGroupsGenerator#normalizeRoo
 | --- | --- | --- |
 | 🔴 P0 | Users and groups report: no permission, system-session export, write and delete in any site (§1.1) — fixed, unreleased | S |
 | 🟠 P1 | Reports ran on `systemsite` instead of the site open in jContent — fixed, unreleased (§3.1) | XS |
-| 🟠 P1 | Reports 2, 6 and 24 fail on a missing resource bundle (§3.5) | S |
+| 🟠 P1 | Reports 2, 6 and 24 fail on a missing resource bundle (§3.5) — fixed, unreleased | S |
 | 🟡 P2 | Request values concatenated into JCR-SQL2 (§1.2) | XS |
 | 🟡 P2 | Results silently cut at 1000 / 10000 rows (§3.2) | S |
 | 🟡 P2 | Release jar built locally, unsigned (§5.1) | S |

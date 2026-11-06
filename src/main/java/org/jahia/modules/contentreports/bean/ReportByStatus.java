@@ -51,7 +51,6 @@ import org.jahia.exceptions.JahiaException;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
-import org.jahia.utils.i18n.Messages;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,7 +69,6 @@ public class ReportByStatus extends BaseReport {
     private final String PROPERTY_LIST = "list";
     private final String PROPERTY_ITEMS = "items";
     private Map<String, Map<String, Object>> dataMap;
-    private static final String BUNDLE = "resources.contentReportReact";
 
     /**
      * The class constructor.
@@ -168,7 +166,7 @@ public class ReportByStatus extends BaseReport {
             dataMap.put(statusName, new HashedMap());
 
         if(!dataMap.get(statusName).containsKey(PROPERTY_NAME))
-            dataMap.get(statusName).put(PROPERTY_NAME,  Messages.get(BUNDLE, statusNameKey, locale));
+            dataMap.get(statusName).put(PROPERTY_NAME,  label(statusNameKey));
 
         if(!dataMap.get(statusName).containsKey(PROPERTY_LIST))
             dataMap.get(statusName).put(PROPERTY_LIST, new ArrayList<JCRNodeWrapper>());

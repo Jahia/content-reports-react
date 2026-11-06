@@ -39,6 +39,13 @@ This file starts at the change below. For releases before it, see the
   panel now reads the site, language and UI language from jContent, and remounts when the site
   changes.
 
+- **By date** (report 2) answered a server error on every run, and **By status** (6) and **Content
+  marked for deletion** (24) as soon as they had a row to label: they read a resource bundle the
+  module never shipped. Month names now come from Java in the report language, and the status
+  labels ship in `resources/contentReportReact*.properties` (en, fr, de, es, it, pt), read with the
+  module's own class loader; a language without a file gets English, never the server's locale.
+  A unit test checks every language file.
+
 ## [2.1.0] - 2026-09-04
 
 ### Added
