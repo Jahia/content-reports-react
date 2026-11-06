@@ -25,8 +25,7 @@ public class ContentReportsQueryExtension {
     @GraphQLField
     @GraphQLName("contentReportsUsersGroups")
     @GraphQLDescription("Access users and groups report administration")
-    // The report lists every user of the platform: server-level user administration only.
-    // `admin` alone lets any editor of any site through (verified on 8.2.3.2).
+    // The report lists the users of the platform: server-level user administration only
     @GraphQLRequiresPermission("adminUsers")
     public static GqlContentReportsUsersGroups contentReportsUsersGroups() {
         return new GqlContentReportsUsersGroups();

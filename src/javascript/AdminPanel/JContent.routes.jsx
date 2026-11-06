@@ -234,7 +234,7 @@ export const registerJContentRoutes = () => {
         isSelectable: false,
         label: 'contentReportReact:categories.usersGroups',
         requireModuleInstalledOnSite: MODULE_KEY,
-        // Server-level user administration: the report lists every user of the platform
+        // Server-level user administration: the report lists the users of the platform
         requiredPermission: 'adminUsers'
     });
 
@@ -243,7 +243,7 @@ export const registerJContentRoutes = () => {
         isSelectable: true,
         label: 'contentReportReact:menu.usersGroups',
         requireModuleInstalledOnSite: MODULE_KEY,
-        // Server-level user administration: the report lists every user of the platform
+        // Server-level user administration: the report lists the users of the platform
         requiredPermission: 'adminUsers',
 
         render: createReportRender('usersGroups')

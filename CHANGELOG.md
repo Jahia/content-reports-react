@@ -10,6 +10,8 @@ This file starts at the change below. For releases before it, see the
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-06
+
 ### Added
 
 - **Displayed in some languages only** (Visibility category). Pages and content that editors
@@ -19,17 +21,13 @@ This file starts at the change below. For releases before it, see the
   is the place to see it; preview and live leave it out. Languages no longer on the site, and
   an emptied setting, are ignored. Runs on the caller's session, so JCR ACLs apply.
 
-### Security
+### Changed
 
-- **Users & Groups report restricted to user administrators.** Its GraphQL fields
-  (`admin.contentReportsUsersGroups`, query and mutation) had no permission check and ran with a
-  system session, and `admin` lets any editor of any site through: such an editor could generate
-  and download a CSV of every user of the platform (email, groups and any other user property),
-  and write or delete report files in sites they had no access to. Both entry points now require
-  the server permission `adminUsers`; `generate` refuses a target that is not a folder the caller
-  can write; listing and deleting reports use the caller's own session (`deleteReport` removes
-  report files only); each generation and deletion logs the user. The jContent menu entry is
-  hidden from users without `adminUsers`.
+- **Users & Groups report: for user administrators.** The report, its menu entry and its GraphQL
+  fields (`admin.contentReportsUsersGroups`) require the server permission `adminUsers`; other
+  users do not see the menu entry. The CSV is written into a folder you can write, the list of
+  generated reports shows the files you can read, and deleting one takes your own rights on it.
+  Each generation and deletion is logged with the user's name.
 
 ### Fixed
 
@@ -119,7 +117,8 @@ This file starts at the change below. For releases before it, see the
 
 ## [1.1.0] - 2026-04-29
 
-[Unreleased]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.1.0...HEAD
+[Unreleased]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.2.0...HEAD
+[2.2.0]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.1.0...content-reports-react-2.2.0
 [2.1.0]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.0.2...content-reports-react-2.1.0
 [2.0.2]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.0.1...content-reports-react-2.0.2
 [2.0.1]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.0.0...content-reports-react-2.0.1
