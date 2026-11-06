@@ -47,6 +47,10 @@ public final class ContentReportFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentReportFactory.class);
 
     private static final String SEARCH_PATH = "searchPath";
+    private static final String PATH_TXT = "pathTxt";
+    private static final String TYPE_SEARCH = "typeSearch";
+    private static final String TYPE_AUTHOR = "typeAuthor";
+    private static final String CREATED = "created";
 
     /**
      * Reports built from the site and, for some, a search path only. Kept out of the switch in
@@ -81,26 +85,26 @@ public final class ContentReportFactory {
             case "1":
                 return new ReportByAuthor(
                         siteNode,
-                        cleanPath(params.get("pathTxt")),
-                        contentTypeOf(params.get("typeSearch")),
-                        actionTypeOf(params.get("typeAuthor")),
+                        cleanPath(params.get(PATH_TXT)),
+                        contentTypeOf(params.get(TYPE_SEARCH)),
+                        actionTypeOf(params.get(TYPE_AUTHOR)),
                         true
                 );
             case "2":
                 return new ReportByAllDate(
                         siteNode,
-                        actionTypeOf(params.get("typeAuthor")),
-                        cleanPath(params.get("pathTxt")),
+                        actionTypeOf(params.get(TYPE_AUTHOR)),
+                        cleanPath(params.get(PATH_TXT)),
                         true
                 );
             case "3":
-                return new ReportBeforeDate(siteNode, cleanPath(params.get("pathTxt")), params.get("date"), true);
+                return new ReportBeforeDate(siteNode, cleanPath(params.get(PATH_TXT)), params.get("date"), true);
             case "4":
-                return new ReportByType(siteNode, cleanPath(params.get("pathTxt")));
+                return new ReportByType(siteNode, cleanPath(params.get(PATH_TXT)));
             case "5":
-                return new ReportByTypeDetailed(siteNode, cleanPath(params.get("pathTxt")));
+                return new ReportByTypeDetailed(siteNode, cleanPath(params.get(PATH_TXT)));
             case "6":
-                return new ReportByStatus(siteNode, cleanPath(params.get("pathTxt")));
+                return new ReportByStatus(siteNode, cleanPath(params.get(PATH_TXT)));
             case "7":
                 return new ReportByLanguage(siteNode);
             case "8":
@@ -127,24 +131,24 @@ public final class ContentReportFactory {
                 return new ReportAclInheritanceStopped(siteNode);
             case "20":
                 LOGGER.debug("Building report 20 with params: {}", params);
-                LOGGER.debug("pathTxt raw value: '{}'", params.get("pathTxt"));
-                LOGGER.debug("pathTxt cleaned value: '{}'", cleanPath(params.get("pathTxt")));
+                LOGGER.debug("pathTxt raw value: '{}'", params.get(PATH_TXT));
+                LOGGER.debug("pathTxt cleaned value: '{}'", cleanPath(params.get(PATH_TXT)));
                 // Use typeAuthorSearch if typeAuthor is not provided (due to 5-parameter limit)
-                String typeAuthorValue = StringUtils.defaultIfEmpty(params.get("typeAuthor"), params.getOrDefault("typeAuthorSearch", "created"));
+                String typeAuthorValue = StringUtils.defaultIfEmpty(params.get(TYPE_AUTHOR), params.getOrDefault("typeAuthorSearch", CREATED));
                 LOGGER.debug("Using typeAuthor value: '{}'", typeAuthorValue);
                 return new ReportByDateAndAuthor(
                         siteNode,
                         actionTypeOf(typeAuthorValue),
-                        cleanPath(params.get("pathTxt")),
-                        params.getOrDefault("typeSearch", "pages"),
+                        cleanPath(params.get(PATH_TXT)),
+                        params.getOrDefault(TYPE_SEARCH, "pages"),
                         true,
                         Boolean.parseBoolean(params.getOrDefault("searchByDate", "false")),
-                        params.getOrDefault("typeDateSearch", "created"),
+                        params.getOrDefault("typeDateSearch", CREATED),
                         params.get("dateBegin"),
                         params.get("dateEnd"),
                         Boolean.parseBoolean(params.getOrDefault("searchAuthor", "false")),
                         params.get("searchUsername"),
-                        params.getOrDefault("typeAuthorSearch", "created"),
+                        params.getOrDefault("typeAuthorSearch", CREATED),
                         sortCol,
                         order
                 );
@@ -152,14 +156,14 @@ public final class ContentReportFactory {
                 return new ReportByUnstranslated(
                         siteNode,
                         params.get("selectLanguageBU"),
-                        cleanPath(params.get("pathTxt")),
+                        cleanPath(params.get(PATH_TXT)),
                         params.get("selectTypeSearch")
                 );
             case "22":
                 return new ReportWipContent(
                         siteNode,
-                        cleanPath(params.get("pathTxt")),
-                        contentTypeOf(params.get("typeSearch")),
+                        cleanPath(params.get(PATH_TXT)),
+                        contentTypeOf(params.get(TYPE_SEARCH)),
                         sortCol,
                         order
                 );
@@ -172,8 +176,8 @@ public final class ContentReportFactory {
             case "24":
                 return new ReportContentMarkedForDeletion(
                         siteNode,
-                        cleanPath(params.get("pathTxt")),
-                        contentTypeOf(params.get("typeSearch")),
+                        cleanPath(params.get(PATH_TXT)),
+                        contentTypeOf(params.get(TYPE_SEARCH)),
                         sortCol,
                         order
                 );
@@ -200,7 +204,7 @@ public final class ContentReportFactory {
     }
 
     private static boolean isCreated(String value) {
-        return StringUtils.equalsIgnoreCase(value, "created");
+        return StringUtils.equalsIgnoreCase(value, CREATED);
     }
 
     private static int parseInt(String value, int defaultValue) {
