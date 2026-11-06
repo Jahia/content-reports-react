@@ -131,8 +131,6 @@ public final class ContentReportFactory {
                 return new ReportAclInheritanceStopped(siteNode);
             case "20":
                 LOGGER.debug("Building report 20 with params: {}", params);
-                LOGGER.debug("pathTxt raw value: '{}'", params.get(PATH_TXT));
-                LOGGER.debug("pathTxt cleaned value: '{}'", cleanPath(params.get(PATH_TXT)));
                 // Use typeAuthorSearch if typeAuthor is not provided (due to 5-parameter limit)
                 String typeAuthorValue = StringUtils.defaultIfEmpty(params.get(TYPE_AUTHOR), params.getOrDefault("typeAuthorSearch", CREATED));
                 LOGGER.debug("Using typeAuthor value: '{}'", typeAuthorValue);
