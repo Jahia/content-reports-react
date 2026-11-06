@@ -10,8 +10,8 @@ import org.jahia.modules.contentreports.service.ReportUsersAndGroupsService;
 import org.jahia.osgi.BundleUtils;
 import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
+import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.content.nodetypes.ExtendedNodeType;
 import org.jahia.services.content.nodetypes.ExtendedPropertyDefinition;
 import org.jahia.services.content.nodetypes.NodeTypeRegistry;
@@ -73,12 +73,10 @@ public class GqlContentReportsUsersGroups {
             @GraphQLName("csvRootPath") @GraphQLNonNull final String csvRootPath) {
         final String folderPath = ReportUsersAndGroupsGenerator.normalizeRootPath(csvRootPath) + "/" + ReportUsersAndGroupsGenerator.REPORT_FOLDER_NAME;
         try {
-            return JCRTemplate.getInstance().doExecuteWithSystemSession((JCRSessionWrapper session) -> {
-                final List<GqlContentReportsUsersGroupsReportFile> files = new ArrayList<>();
-                if (!session.nodeExists(folderPath)) {
-                    return files;
-                }
-
+            // The caller's own session: only the reports they may read are listed
+            final JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession();
+            final List<GqlContentReportsUsersGroupsReportFile> files = new ArrayList<>();
+            if (session.nodeExists(folderPath)) {
                 final String queryStmt = String.format(
                         "SELECT * FROM [jnt:file] AS f WHERE ISDESCENDANTNODE(f, '%s')",
                         JCRContentUtils.sqlEncode(folderPath));
@@ -100,10 +98,9 @@ public class GqlContentReportsUsersGroups {
                         LOGGER.warn("Could not read metadata for users and groups report {}", node.getPath(), e);
                     }
                 }
-
-                files.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
-                return files;
-            });
+            }
+            files.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+            return files;
         } catch (RepositoryException e) {
             LOGGER.error("Error listing users and groups reports at {}", folderPath, e);
             return new ArrayList<>();

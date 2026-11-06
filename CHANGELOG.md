@@ -10,6 +10,35 @@ This file starts at the change below. For releases before it, see the
 
 ## [Unreleased]
 
+### Added
+
+- **Displayed in some languages only** (Visibility category). Pages and content that editors
+  switched off in some of the site's languages (Content Editor, Visibility > Languages, stored
+  as `j:invalidLanguages`): title, path, type, the languages each is displayed in and the
+  languages it is hidden in. Page Builder draws such content in every language, so the report
+  is the place to see it; preview and live leave it out. Languages no longer on the site, and
+  an emptied setting, are ignored. Runs on the caller's session, so JCR ACLs apply.
+
+### Security
+
+- **Users & Groups report restricted to user administrators.** Its GraphQL fields
+  (`admin.contentReportsUsersGroups`, query and mutation) had no permission check and ran with a
+  system session, and `admin` lets any editor of any site through: such an editor could generate
+  and download a CSV of every user of the platform (email, groups and any other user property),
+  and write or delete report files in sites they had no access to. Both entry points now require
+  the server permission `adminUsers`; `generate` refuses a target that is not a folder the caller
+  can write; listing and deleting reports use the caller's own session (`deleteReport` removes
+  report files only); each generation and deletion logs the user. The jContent menu entry is
+  hidden from users without `adminUsers`.
+
+### Fixed
+
+- Reports ran on the site the server resolved for the request instead of the site selected in
+  jContent: on an instance where sites share the server name `localhost` (Jahia Cloud, local
+  Docker), every report title, default search path and path picker showed `systemsite`. The
+  panel now reads the site, language and UI language from jContent, and remounts when the site
+  changes.
+
 ## [2.1.0] - 2026-09-04
 
 ### Added

@@ -17,9 +17,12 @@ const createReportRender = reportId => {
             }
         };
 
+        // Remount per site: the panel keeps the previous site's fields and results otherwise
+        const siteKey = window.jahia?.reduxStore?.getState?.()?.site;
+
         return (
             <Suspense fallback="loading...">
-                <AdminPanel match={mockMatch} initialReportId={reportId}/>
+                <AdminPanel key={siteKey} match={mockMatch} initialReportId={reportId}/>
             </Suspense>
         );
     };
@@ -179,6 +182,16 @@ export const registerJContentRoutes = () => {
         render: createReportRender('27')
     });
 
+    // Displayed in some languages only
+    registry.add('adminRoute', 'contentReportReact-visibility-conditions-partialLanguageVisibility', {
+        targets: ['jcontent-contentReportReact-visibility-conditions'],
+        isSelectable: true,
+        label: 'contentReportReact:menu.partialLanguageVisibility',
+        requireModuleInstalledOnSite: MODULE_KEY,
+
+        render: createReportRender('31')
+    });
+
     // === METADATA CATEGORY ===
 
     // Metadata category (not selectable)
@@ -215,7 +228,9 @@ export const registerJContentRoutes = () => {
         targets: ['jcontent-jcontent-contentReports'],
         isSelectable: false,
         label: 'contentReportReact:categories.usersGroups',
-        requireModuleInstalledOnSite: MODULE_KEY
+        requireModuleInstalledOnSite: MODULE_KEY,
+        // Server-level user administration: the report lists every user of the platform
+        requiredPermission: 'adminUsers'
     });
 
     registry.add('adminRoute', 'contentReportReact-users-groups-report', {
@@ -223,6 +238,8 @@ export const registerJContentRoutes = () => {
         isSelectable: true,
         label: 'contentReportReact:menu.usersGroups',
         requireModuleInstalledOnSite: MODULE_KEY,
+        // Server-level user administration: the report lists every user of the platform
+        requiredPermission: 'adminUsers',
 
         render: createReportRender('usersGroups')
     });

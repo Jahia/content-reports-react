@@ -41,6 +41,7 @@
       "liveContents": "Live-Sichtbarkeitsbedingungen",
       "expiredContents": "Abgelaufener Inhalt",
       "futureContents": "Geplanter Inhalt",
+      "partialLanguageVisibility": "Nur in einigen Sprachen angezeigt",
       "usersGroups": "Benutzer- und Gruppenbericht"
     },
     "descriptions": {
@@ -63,6 +64,7 @@
       "liveContents": "Inhalte mit Live-Sichtbarkeitsbedingungen anzeigen. Dieser Bericht zeigt Inhalte mit angewendeten bedingten Sichtbarkeitsregeln, einschließlich der Bedingungen, des Übereinstimmungsstatus und des aktuellen Sichtbarkeitsstatus.",
       "expiredContents": "Inhalte mit abgelaufenen Sichtbarkeitsbedingungen anzeigen. Dieser Bericht identifiziert Inhalte mit Sichtbarkeitsenddaten, die bereits vergangen sind, wodurch der Inhalt auf der Live-Site nicht mehr sichtbar ist.",
       "futureContents": "Inhalte anzeigen, die in Zukunft live gehen sollen. Dieser Bericht zeigt Inhalte mit Sichtbarkeitsstartdaten, die noch nicht erreicht wurden, sodass Sie bevorstehende Inhaltsveröffentlichungen vorher ansehen können.",
+      "partialLanguageVisibility": "Seiten und Inhalte anzeigen, die Redakteure in einigen Sprachen der Site deaktiviert haben (Sichtbarkeit > Sprachen im Content Editor). Page Builder zeigt sie weiterhin in allen Sprachen; die Vorschau und die Live-Site blenden sie in den als ausgeblendet aufgeführten Sprachen aus.",
       "pagesWithoutKeywords": "Seiten identifizieren, denen SEO-Schlüsselwörter fehlen. Dieser Bericht hilft Ihnen, Seiten zu finden, die Schlüsselwort-Metadaten für eine bessere Suchmaschinenoptimierung benötigen.",
       "pagesWithoutDescription": "Seiten identifizieren, denen Beschreibungen in einer oder mehreren Sprachen fehlen. Der Bericht zeigt den Pfad und gibt an, welche Sprachen Beschreibungen für bessere SEO und Barrierefreiheit definiert haben.",
       "usersGroups": "Erstellen Sie einen CSV-Bericht aller Jahia-Benutzer über alle Sites hinweg einschließlich ihrer Gruppenmitgliedschaften. Berichte werden im JCR gespeichert und können direkt von dieser Seite heruntergeladen werden."
@@ -267,6 +269,15 @@
           "path": "Pfad",
           "type": "Typ",
           "liveDate": "Live-Datum"
+        }
+      },
+      "partialLanguageVisibility": {
+        "columns": {
+          "title": "Titel",
+          "path": "Pfad",
+          "type": "Typ",
+          "displayedIn": "Angezeigt in",
+          "hiddenIn": "Ausgeblendet in"
         }
       },
       "pagesWithoutKeywords": {

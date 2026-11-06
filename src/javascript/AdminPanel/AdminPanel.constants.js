@@ -332,6 +332,23 @@ const reports = [
         ]
     },
     {
+        id: '31',
+        labelKey: 'menu.partialLanguageVisibility',
+        type: 'legacy',
+        category: 'visibility',
+        descriptionKey: 'descriptions.partialLanguageVisibility',
+        fields: [
+            {name: 'searchPath', type: 'path', labelKey: 'fields.searchPath', defaultValue: PATH_DEFAULT, required: true}
+        ],
+        columns: [
+            {key: 'title', labelKey: 'reports.partialLanguageVisibility.columns.title', sortable: true},
+            {key: 'path', labelKey: 'reports.partialLanguageVisibility.columns.path', sortable: true, type: 'link'},
+            {key: 'type', labelKey: 'reports.partialLanguageVisibility.columns.type', sortable: true},
+            {key: 'displayedIn', labelKey: 'reports.partialLanguageVisibility.columns.displayedIn', sortable: true},
+            {key: 'hiddenIn', labelKey: 'reports.partialLanguageVisibility.columns.hiddenIn', sortable: true}
+        ]
+    },
+    {
         id: '11',
         labelKey: 'menu.pagesWithoutKeywords',
         type: 'legacy',

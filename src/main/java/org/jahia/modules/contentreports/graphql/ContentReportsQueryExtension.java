@@ -6,6 +6,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.jahia.modules.graphql.provider.dxm.admin.GqlAdminQuery;
+import org.jahia.modules.graphql.provider.dxm.security.GraphQLRequiresPermission;
 
 import javax.jcr.RepositoryException;
 
@@ -24,6 +25,9 @@ public class ContentReportsQueryExtension {
     @GraphQLField
     @GraphQLName("contentReportsUsersGroups")
     @GraphQLDescription("Access users and groups report administration")
+    // The report lists every user of the platform: server-level user administration only.
+    // `admin` alone lets any editor of any site through (verified on 8.2.3.2).
+    @GraphQLRequiresPermission("adminUsers")
     public static GqlContentReportsUsersGroups contentReportsUsersGroups() {
         return new GqlContentReportsUsersGroups();
     }

@@ -29,6 +29,7 @@ import org.jahia.modules.contentreports.bean.ReportOverview;
 import org.jahia.modules.contentreports.bean.ReportSiteModules;
 import org.jahia.modules.contentreports.bean.ReportComponentUsage;
 import org.jahia.modules.contentreports.bean.ReportPagesWithoutDescription;
+import org.jahia.modules.contentreports.bean.ReportPartialLanguageVisibility;
 import org.jahia.modules.contentreports.bean.ReportPagesWithoutKeyword;
 import org.jahia.modules.contentreports.bean.ReportPagesWithoutTitle;
 import org.jahia.modules.contentreports.bean.ReportUnreferencedAssets;
@@ -170,6 +171,8 @@ public final class ContentReportFactory {
                 return new ReportSiteModules(siteNode);
             case "30":
                 return new ReportComponentUsage(siteNode);
+            case "31":
+                return new ReportPartialLanguageVisibility(siteNode, cleanPath(params.get("searchPath")));
             default:
                 throw new ContentReportException("Invalid reportId: " + reportId);
         }
