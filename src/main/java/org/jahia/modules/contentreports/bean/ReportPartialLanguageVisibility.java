@@ -120,17 +120,6 @@ public class ReportPartialLanguageVisibility extends BaseReport {
 
     @Override
     public JSONObject getJson() throws JSONException, RepositoryException {
-        JSONArray data = new JSONArray();
-        for (JSONArray row : rows) {
-            data.put(row);
-        }
-
-        JSONObject json = new JSONObject();
-        json.put("recordsTotal", rows.size());
-        json.put("recordsFiltered", rows.size());
-        json.put("siteName", siteNode.getName());
-        json.put("siteDisplayableName", siteNode.getDisplayableName());
-        json.put("data", data);
-        return json;
+        return buildJsonResponse(rows.size(), new JSONArray(rows));
     }
 }

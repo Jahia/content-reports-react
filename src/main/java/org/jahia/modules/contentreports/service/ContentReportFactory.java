@@ -38,11 +38,30 @@ import org.jahia.modules.contentreports.exception.ContentReportException;
 import org.jahia.services.content.decorator.JCRSiteNode;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 public final class ContentReportFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentReportFactory.class);
+
+    private static final String SEARCH_PATH = "searchPath";
+
+    /**
+     * Reports built from the site and, for some, a search path only. Kept out of the switch in
+     * {@link #build}, which handles the reports that read several parameters.
+     */
+    private static final Map<String, BiFunction<JCRSiteNode, Map<String, String>, BaseReport>> SIMPLE_REPORTS = new HashMap<>();
+
+    static {
+        SIMPLE_REPORTS.put("25", (site, params) -> new ReportLiveContents(site, cleanPath(params.get(SEARCH_PATH))));
+        SIMPLE_REPORTS.put("26", (site, params) -> new ReportByExpiredContent(site, cleanPath(params.get(SEARCH_PATH))));
+        SIMPLE_REPORTS.put("27", (site, params) -> new ReportByFutureContent(site, cleanPath(params.get(SEARCH_PATH))));
+        SIMPLE_REPORTS.put("29", (site, params) -> new ReportSiteModules(site));
+        SIMPLE_REPORTS.put("30", (site, params) -> new ReportComponentUsage(site));
+        SIMPLE_REPORTS.put("31", (site, params) -> new ReportPartialLanguageVisibility(site, cleanPath(params.get(SEARCH_PATH))));
+    }
 
     private ContentReportFactory() {
     }
@@ -52,6 +71,11 @@ public final class ContentReportFactory {
         Map<String, String> params = parameters != null ? parameters : Collections.emptyMap();
         int sortCol = sortColumn != null ? sortColumn : parseInt(params.get("order[0][column]"), 0);
         String order = StringUtils.defaultString(sortDirection, params.getOrDefault("order[0][dir]", ""));
+
+        BiFunction<JCRSiteNode, Map<String, String>, BaseReport> simpleReport = SIMPLE_REPORTS.get(reportId);
+        if (simpleReport != null) {
+            return simpleReport.apply(siteNode, params);
+        }
 
         switch (reportId) {
             case "1":
@@ -156,23 +180,11 @@ public final class ContentReportFactory {
                         sortCol,
                         order
                 );
-            case "25":
-                return new ReportLiveContents(siteNode, cleanPath(params.get("searchPath")));
-            case "26":
-                return new ReportByExpiredContent(siteNode, cleanPath(params.get("searchPath")));
-            case "27":
-                return new ReportByFutureContent(siteNode, cleanPath(params.get("searchPath")));
             case "28":
                 return new ReportUnreferencedAssets(
                         siteNode,
                         cleanPath(params.get("assetsRootPath"))
                 );
-            case "29":
-                return new ReportSiteModules(siteNode);
-            case "30":
-                return new ReportComponentUsage(siteNode);
-            case "31":
-                return new ReportPartialLanguageVisibility(siteNode, cleanPath(params.get("searchPath")));
             default:
                 throw new ContentReportException("Invalid reportId: " + reportId);
         }

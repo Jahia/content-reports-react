@@ -28,6 +28,18 @@ const createReportRender = reportId => {
     };
 };
 
+// Registers a selectable report entry under a category: route key, menu label and target all
+// follow from the category and the report key
+const addReportRoute = (category, reportKey, reportId) => {
+    registry.add('adminRoute', `contentReportReact-${category}-${reportKey}`, {
+        targets: [`jcontent-contentReportReact-${category}`],
+        isSelectable: true,
+        label: `contentReportReact:menu.${reportKey}`,
+        requireModuleInstalledOnSite: MODULE_KEY,
+        render: createReportRender(reportId)
+    });
+};
+
 export const registerJContentRoutes = () => {
     // Load i18n namespace
     window.jahia.i18n.loadNamespaces('contentReportReact');
@@ -183,14 +195,7 @@ export const registerJContentRoutes = () => {
     });
 
     // Displayed in some languages only
-    registry.add('adminRoute', 'contentReportReact-visibility-conditions-partialLanguageVisibility', {
-        targets: ['jcontent-contentReportReact-visibility-conditions'],
-        isSelectable: true,
-        label: 'contentReportReact:menu.partialLanguageVisibility',
-        requireModuleInstalledOnSite: MODULE_KEY,
-
-        render: createReportRender('31')
-    });
+    addReportRoute('visibility-conditions', 'partialLanguageVisibility', '31');
 
     // === METADATA CATEGORY ===
 
