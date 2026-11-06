@@ -34,7 +34,7 @@
     <groupId>org.jahia.community</groupId>
     <artifactId>content-reports-react</artifactId>
     <name>Content Reports React</name>
-    <version>2.2.0</version>
+    <version>2.2.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>A comprehensive content reporting tool for Jahia DX, built with React and the Moonstone UI library. This module provides powerful insights into your Jahia site's content through various customizable reports.</description>
 
@@ -42,7 +42,7 @@
         <connection>scm:git:git@github.com:jahia/contentReportReact.git</connection>
         <developerConnection>scm:git:git@github.com:jahia/contentReportReact.git</developerConnection>
         <url>https://github.com/jahia/contentReportReact</url>
-        <tag>content-reports-react-2.2.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
