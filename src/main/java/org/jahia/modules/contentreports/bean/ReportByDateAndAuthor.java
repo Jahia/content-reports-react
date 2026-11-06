@@ -46,6 +46,7 @@ package org.jahia.modules.contentreports.bean;
 
 import org.apache.commons.lang.WordUtils;
 import org.jahia.exceptions.JahiaException;
+import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
@@ -131,7 +132,7 @@ public class ReportByDateAndAuthor extends QueryReport {
         if (searchByAuthor) {
             String usernameField;
             if (typeAuthorSearch.equals("modified")) { usernameField = "jcr:lastModifiedBy"; } else { usernameField = "jcr:createdBy";   }
-            searchByAuthorStatement = " AND item.["+usernameField+"] = '"+searchUsername+"'";
+            searchByAuthorStatement = " AND item.["+usernameField+"] = '"+JCRContentUtils.sqlEncode(searchUsername)+"'";
         }
 
         String orderStatement = " order by item.["+resultFields[sortCol]+"] " + sortOrder;

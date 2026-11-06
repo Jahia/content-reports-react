@@ -24,10 +24,7 @@ This file starts at the change below. For releases before it, see the
 ### Changed
 
 - **Users & Groups report: for user administrators.** The report, its menu entry and its GraphQL
-  fields (`admin.contentReportsUsersGroups`) require the server permission `adminUsers`; other
-  users do not see the menu entry. The CSV is written into a folder you can write, the list of
-  generated reports shows the files you can read, and deleting one takes your own rights on it.
-  Each generation and deletion is logged with the user's name.
+  fields (`admin.contentReportsUsersGroups`) require the server permission `adminUsers`.
 
 ### Fixed
 
@@ -43,6 +40,10 @@ This file starts at the change below. For releases before it, see the
   labels ship in `resources/contentReportReact*.properties` (en, fr, de, es, it, pt), read with the
   module's own class loader; a language without a file gets English, never the server's locale.
   A unit test checks every language file.
+
+- **Before date** and **By author and date** check their dates (`yyyy-MM-dd`, the format of the
+  date fields) and answer "Invalid date, expected yyyy-MM-dd" otherwise; a user name containing an
+  apostrophe finds that user's content.
 
 ## [2.1.0] - 2026-09-04
 

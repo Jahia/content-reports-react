@@ -65,7 +65,7 @@ The Content Report React module offers a modern, user-friendly interface for gen
 
 ### 👥 Users & Groups Report
 - **Report Users & Groups**: Generate a CSV report of all Jahia users across all sites, including group memberships; reports are stored in JCR and downloadable directly from the page
-- Requires the server permission `adminUsers` (server administrators): the report lists every user of the platform, so the menu entry and its GraphQL fields (`admin.contentReportsUsersGroups`) refuse anyone else. The CSV is written into a folder you must be able to write; listing and deleting reports use your own permissions. The nightly job writes to `jahia.contentReports.usersGroups.job.csvRootPath` (default `/sites/systemsite/files`): keep that folder readable by administrators only
+- Requires the server permission `adminUsers` (server administrators). The nightly job writes to `jahia.contentReports.usersGroups.job.csvRootPath` (default `/sites/systemsite/files`): keep that folder readable by administrators only
 
 ### ⚙️ System Reports
 - **Locked Content**: All content currently locked by users, showing creator, lock holder, and location

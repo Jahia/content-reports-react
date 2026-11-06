@@ -73,7 +73,6 @@ public class GqlContentReportsUsersGroups {
             @GraphQLName("csvRootPath") @GraphQLNonNull final String csvRootPath) {
         final String folderPath = ReportUsersAndGroupsGenerator.normalizeRootPath(csvRootPath) + "/" + ReportUsersAndGroupsGenerator.REPORT_FOLDER_NAME;
         try {
-            // The caller's own session: only the reports they may read are listed
             final JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession();
             final List<GqlContentReportsUsersGroupsReportFile> files = new ArrayList<>();
             if (session.nodeExists(folderPath)) {

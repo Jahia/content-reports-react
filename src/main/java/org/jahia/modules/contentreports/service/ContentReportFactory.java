@@ -37,6 +37,8 @@ import org.jahia.modules.contentreports.bean.ReportWipContent;
 import org.jahia.modules.contentreports.exception.ContentReportException;
 import org.jahia.services.content.decorator.JCRSiteNode;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +76,7 @@ public final class ContentReportFactory {
                                    Integer sortColumn, String sortDirection) throws ContentReportException {
         Map<String, String> params = parameters != null ? parameters : Collections.emptyMap();
         int sortCol = sortColumn != null ? sortColumn : parseInt(params.get("order[0][column]"), 0);
-        String order = StringUtils.defaultString(sortDirection, params.getOrDefault("order[0][dir]", ""));
+        String order = sortOrderOf(StringUtils.defaultString(sortDirection, params.getOrDefault("order[0][dir]", "")));
 
         BiFunction<JCRSiteNode, Map<String, String>, BaseReport> simpleReport = SIMPLE_REPORTS.get(reportId);
         if (simpleReport != null) {
@@ -98,7 +100,7 @@ public final class ContentReportFactory {
                         true
                 );
             case "3":
-                return new ReportBeforeDate(siteNode, cleanPath(params.get(PATH_TXT)), params.get("date"), true);
+                return new ReportBeforeDate(siteNode, cleanPath(params.get(PATH_TXT)), isoDate(params.get("date")), true);
             case "4":
                 return new ReportByType(siteNode, cleanPath(params.get(PATH_TXT)));
             case "5":
@@ -142,8 +144,8 @@ public final class ContentReportFactory {
                         true,
                         Boolean.parseBoolean(params.getOrDefault("searchByDate", "false")),
                         params.getOrDefault("typeDateSearch", CREATED),
-                        params.get("dateBegin"),
-                        params.get("dateEnd"),
+                        isoDate(params.get("dateBegin")),
+                        isoDate(params.get("dateEnd")),
                         Boolean.parseBoolean(params.getOrDefault("searchAuthor", "false")),
                         params.get("searchUsername"),
                         params.getOrDefault("typeAuthorSearch", CREATED),
@@ -186,6 +188,28 @@ public final class ContentReportFactory {
                 );
             default:
                 throw new ContentReportException("Invalid reportId: " + reportId);
+        }
+    }
+
+    /** {@code DESC} when asked for, {@code ASC} otherwise: the value ends an ORDER BY clause. */
+    static String sortOrderOf(String direction) {
+        return "desc".equalsIgnoreCase(StringUtils.trim(direction)) ? "DESC" : "ASC";
+    }
+
+    /**
+     * A date parameter as {@code yyyy-MM-dd}, or an empty string when none was sent; the value is
+     * written into a CAST in the query.
+     *
+     * @throws ContentReportException when the value is not an ISO date
+     */
+    static String isoDate(String value) throws ContentReportException {
+        if (StringUtils.isBlank(value)) {
+            return "";
+        }
+        try {
+            return LocalDate.parse(value.trim()).toString();
+        } catch (DateTimeParseException e) {
+            throw new ContentReportException("Invalid date, expected yyyy-MM-dd");
         }
     }
 

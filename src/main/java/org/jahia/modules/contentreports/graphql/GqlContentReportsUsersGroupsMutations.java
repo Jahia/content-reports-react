@@ -24,6 +24,7 @@ import java.util.List;
 public class GqlContentReportsUsersGroupsMutations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GqlContentReportsUsersGroupsMutations.class);
+    private static final String PERMISSION_DENIED = "Permission denied";
     private static final List<String> DEFAULT_USER_PROPERTIES = Arrays.asList("j:firstName", "j:lastName");
 
     @GraphQLField
@@ -37,14 +38,14 @@ public class GqlContentReportsUsersGroupsMutations {
             LOGGER.error("ReportUsersAndGroupsService is not available");
             return Boolean.FALSE;
         }
-        // The file is written with a system session (the job has no user): the caller must be able
-        // to write the folder they chose, checked with their own session.
+        // The target is a folder the user can add files to
         final String rootPath = ReportUsersAndGroupsGenerator.normalizeRootPath(csvRootPath);
         final JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession();
-        if (!session.nodeExists(rootPath)
-                || !session.getNode(rootPath).isNodeType("jnt:folder")
-                || !session.getNode(rootPath).hasPermission("jcr:addChildNodes")) {
-            throw new BaseGqlClientException("Permission denied", null, Collections.emptyMap());
+        if (!session.nodeExists(rootPath) || !session.getNode(rootPath).isNodeType("jnt:folder")) {
+            throw new BaseGqlClientException("Target folder not found or not a folder", null, Collections.emptyMap());
+        }
+        if (!session.getNode(rootPath).hasPermission("jcr:addChildNodes")) {
+            throw new BaseGqlClientException(PERMISSION_DENIED, null, Collections.emptyMap());
         }
         LOGGER.info("Users and groups report requested by {} into {}", session.getUser().getUsername(), rootPath);
         final List<String> propertiesToExport = userPropertiesToExport != null ? userPropertiesToExport : DEFAULT_USER_PROPERTIES;
@@ -59,14 +60,16 @@ public class GqlContentReportsUsersGroupsMutations {
             LOGGER.warn("Refusing to delete a non users-and-groups report path: {}", path);
             return Boolean.FALSE;
         }
-        // The caller's own session: JCR decides whether they may remove the file
         final JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession();
         if (!session.nodeExists(path)) {
             return Boolean.TRUE;
         }
         final JCRNodeWrapper node = session.getNode(path);
-        if (!node.isNodeType("jnt:file") || !node.hasPermission("jcr:removeNode")) {
-            throw new BaseGqlClientException("Permission denied", null, Collections.emptyMap());
+        if (!node.isNodeType("jnt:file")) {
+            throw new BaseGqlClientException("Not a report file", null, Collections.emptyMap());
+        }
+        if (!node.hasPermission("jcr:removeNode")) {
+            throw new BaseGqlClientException(PERMISSION_DENIED, null, Collections.emptyMap());
         }
         node.remove();
         session.save();
