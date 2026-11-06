@@ -10,6 +10,41 @@ This file starts at the change below. For releases before it, see the
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-06
+
+### Added
+
+- **Displayed in some languages only** (Visibility category). Pages and content that editors
+  switched off in some of the site's languages (Content Editor, Visibility > Languages, stored
+  as `j:invalidLanguages`): title, path, type, the languages each is displayed in and the
+  languages it is hidden in. Page Builder draws such content in every language, so the report
+  is the place to see it; preview and live leave it out. Languages no longer on the site, and
+  an emptied setting, are ignored. Runs on the caller's session, so JCR ACLs apply.
+
+### Changed
+
+- **Users & Groups report: for user administrators.** The report, its menu entry and its GraphQL
+  fields (`admin.contentReportsUsersGroups`) require the server permission `adminUsers`.
+
+### Fixed
+
+- Reports ran on the site the server resolved for the request instead of the site selected in
+  jContent: on an instance where sites share the server name `localhost` (Jahia Cloud, local
+  Docker), every report title, default search path and path picker showed `systemsite`. The
+  panel now reads the site, language and UI language from jContent, and remounts when the site
+  changes.
+
+- **By date** (report 2) answered a server error on every run, and **By status** (6) and **Content
+  marked for deletion** (24) as soon as they had a row to label: they read a resource bundle the
+  module never shipped. Month names now come from Java in the report language, and the status
+  labels ship in `resources/contentReportReact*.properties` (en, fr, de, es, it, pt), read with the
+  module's own class loader; a language without a file gets English, never the server's locale.
+  A unit test checks every language file.
+
+- **Before date** and **By author and date** check their dates (`yyyy-MM-dd`, the format of the
+  date fields) and answer "Invalid date, expected yyyy-MM-dd" otherwise; a user name containing an
+  apostrophe finds that user's content.
+
 ## [2.1.0] - 2026-09-04
 
 ### Added
@@ -83,7 +118,8 @@ This file starts at the change below. For releases before it, see the
 
 ## [1.1.0] - 2026-04-29
 
-[Unreleased]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.1.0...HEAD
+[Unreleased]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.2.0...HEAD
+[2.2.0]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.1.0...content-reports-react-2.2.0
 [2.1.0]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.0.2...content-reports-react-2.1.0
 [2.0.2]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.0.1...content-reports-react-2.0.2
 [2.0.1]: https://github.com/Jahia/contentReportReact/compare/content-reports-react-2.0.0...content-reports-react-2.0.1

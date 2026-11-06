@@ -17,12 +17,27 @@ const createReportRender = reportId => {
             }
         };
 
+        // Remount per site: the panel keeps the previous site's fields and results otherwise
+        const siteKey = window.jahia?.reduxStore?.getState?.()?.site;
+
         return (
             <Suspense fallback="loading...">
-                <AdminPanel match={mockMatch} initialReportId={reportId}/>
+                <AdminPanel key={siteKey} match={mockMatch} initialReportId={reportId}/>
             </Suspense>
         );
     };
+};
+
+// Registers a selectable report entry under a category: route key, menu label and target all
+// follow from the category and the report key
+const addReportRoute = (category, reportKey, reportId) => {
+    registry.add('adminRoute', `contentReportReact-${category}-${reportKey}`, {
+        targets: [`jcontent-contentReportReact-${category}`],
+        isSelectable: true,
+        label: `contentReportReact:menu.${reportKey}`,
+        requireModuleInstalledOnSite: MODULE_KEY,
+        render: createReportRender(reportId)
+    });
 };
 
 export const registerJContentRoutes = () => {
@@ -179,6 +194,9 @@ export const registerJContentRoutes = () => {
         render: createReportRender('27')
     });
 
+    // Displayed in some languages only
+    addReportRoute('visibility-conditions', 'partialLanguageVisibility', '31');
+
     // === METADATA CATEGORY ===
 
     // Metadata category (not selectable)
@@ -215,7 +233,9 @@ export const registerJContentRoutes = () => {
         targets: ['jcontent-jcontent-contentReports'],
         isSelectable: false,
         label: 'contentReportReact:categories.usersGroups',
-        requireModuleInstalledOnSite: MODULE_KEY
+        requireModuleInstalledOnSite: MODULE_KEY,
+        // Server-level user administration: the report lists the users of the platform
+        requiredPermission: 'adminUsers'
     });
 
     registry.add('adminRoute', 'contentReportReact-users-groups-report', {
@@ -223,6 +243,8 @@ export const registerJContentRoutes = () => {
         isSelectable: true,
         label: 'contentReportReact:menu.usersGroups',
         requireModuleInstalledOnSite: MODULE_KEY,
+        // Server-level user administration: the report lists the users of the platform
+        requiredPermission: 'adminUsers',
 
         render: createReportRender('usersGroups')
     });

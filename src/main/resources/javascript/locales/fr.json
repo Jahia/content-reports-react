@@ -41,6 +41,7 @@
       "liveContents": "Visibilité en ligne",
       "expiredContents": "Contenus expirés",
       "futureContents": "Contenus programmés",
+      "partialLanguageVisibility": "Affichés dans certaines langues seulement",
       "usersGroups": "Rapport utilisateurs et groupes"
     },
     "descriptions": {
@@ -63,6 +64,7 @@
       "liveContents": "Afficher le contenu avec des conditions de visibilité en ligne. Ce rapport affiche le contenu ayant des règles de visibilité conditionnelles appliquées, montrant les conditions, l'état de correspondance et l'état de visibilité actuel.",
       "expiredContents": "Afficher le contenu avec des conditions de visibilité expirées. Ce rapport identifie le contenu ayant des dates de fin de visibilité déjà passées, rendant le contenu invisible sur le site en ligne.",
       "futureContents": "Afficher le contenu programmé pour être publié dans le futur. Ce rapport montre le contenu avec des dates de début de visibilité qui n'ont pas encore été atteintes, vous permettant de prévisualiser les publications de contenu à venir.",
+      "partialLanguageVisibility": "Afficher les pages et contenus que les contributeurs ont désactivés dans certaines langues du site (Visibilité > Langues dans Content Editor). Page Builder les affiche toujours dans toutes les langues ; la prévisualisation et le site en ligne les masquent dans les langues indiquées comme masquées.",
       "pagesWithoutKeywords": "Identifier les pages auxquelles il manque des mots-clés SEO. Ce rapport vous aide à trouver les pages qui nécessitent des métadonnées de mots-clés pour une meilleure optimisation des moteurs de recherche.",
       "pagesWithoutDescription": "Identifier les pages auxquelles il manque des descriptions dans une ou plusieurs langues. Le rapport affiche le chemin et indique quelles langues ont des descriptions définies pour un meilleur référencement et une meilleure accessibilité.",
       "usersGroups": "Générez un rapport CSV de tous les utilisateurs Jahia sur tous les sites, avec leurs appartenances aux groupes. Les rapports sont stockés dans le JCR et peuvent être téléchargés directement depuis cette page."
@@ -267,6 +269,15 @@
           "path": "Chemin",
           "type": "Type",
           "liveDate": "Date de mise en ligne"
+        }
+      },
+      "partialLanguageVisibility": {
+        "columns": {
+          "title": "Titre",
+          "path": "Chemin",
+          "type": "Type",
+          "displayedIn": "Affiché en",
+          "hiddenIn": "Masqué en"
         }
       },
       "pagesWithoutKeywords": {

@@ -46,6 +46,7 @@ package org.jahia.modules.contentreports.bean;
 
 import org.apache.commons.lang.WordUtils;
 import org.jahia.exceptions.JahiaException;
+import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
@@ -67,6 +68,7 @@ import java.util.*;
 public class ReportByDateAndAuthor extends QueryReport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportByDateAndAuthor.class);
+    private static final String AND_ITEM = " AND item.[";
 
     private Map<Integer, Map<Integer, Map<String, Integer>>> dataMap;
     private Map<String, Map<String, Object>> pageMap;
@@ -125,13 +127,13 @@ public class ReportByDateAndAuthor extends QueryReport {
             String dateSearchField;
             if (typeDateSearch.equals("modified")) { dateSearchField = "jcr:lastModified"; } else { dateSearchField = "jcr:created";   }
             // cast('2018-01-01T00:00:00.000+02:00' as date)
-            if (!dateBegin.isEmpty()) { searchByDateStatement += " AND item.["+dateSearchField+"] >= cast('"+dateBegin+"T00:00:00.000+00:00' as date) "; }
-            if (!dateEnd.isEmpty())  { searchByDateStatement += " AND item.["+dateSearchField+"] <= cast('"+dateEnd+"T00:00:00.000+00:00' as date)"; }
+            if (!dateBegin.isEmpty()) { searchByDateStatement += AND_ITEM+dateSearchField+"] >= cast('"+dateBegin+"T00:00:00.000+00:00' as date) "; }
+            if (!dateEnd.isEmpty())  { searchByDateStatement += AND_ITEM+dateSearchField+"] <= cast('"+dateEnd+"T00:00:00.000+00:00' as date)"; }
         }
         if (searchByAuthor) {
             String usernameField;
             if (typeAuthorSearch.equals("modified")) { usernameField = "jcr:lastModifiedBy"; } else { usernameField = "jcr:createdBy";   }
-            searchByAuthorStatement = " AND item.["+usernameField+"] = '"+searchUsername+"'";
+            searchByAuthorStatement = AND_ITEM+usernameField+"] = '"+JCRContentUtils.sqlEncode(searchUsername)+"'";
         }
 
         String orderStatement = " order by item.["+resultFields[sortCol]+"] " + sortOrder;

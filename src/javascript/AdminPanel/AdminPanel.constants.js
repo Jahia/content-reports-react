@@ -332,6 +332,19 @@ const reports = [
         ]
     },
     {
+        id: '31',
+        labelKey: 'menu.partialLanguageVisibility',
+        type: 'legacy',
+        category: 'visibility',
+        descriptionKey: 'descriptions.partialLanguageVisibility',
+        fields: [
+            {name: 'searchPath', type: 'path', labelKey: 'fields.searchPath', defaultValue: PATH_DEFAULT, required: true}
+        ],
+        // Every column sortable, labelled from reports.partialLanguageVisibility.columns.<key>
+        columns: [{key: 'title'}, {key: 'path', type: 'link'}, {key: 'type'}, {key: 'displayedIn'}, {key: 'hiddenIn'}]
+            .map(column => ({...column, labelKey: `reports.partialLanguageVisibility.columns.${column.key}`, sortable: true}))
+    },
+    {
         id: '11',
         labelKey: 'menu.pagesWithoutKeywords',
         type: 'legacy',

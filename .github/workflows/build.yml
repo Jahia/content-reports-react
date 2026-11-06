@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+  # Run on a release tag to build the jar attached to the GitHub release:
+  # gh workflow run build.yml --ref content-reports-react-X.Y.Z
+  workflow_dispatch:
 
 jobs:
   build:
@@ -35,6 +38,21 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
         env:
+          # Keeps the build machine's path out of the manifest
+          JAHIA_DISABLE_SOURCE_FOLDERS: "true"
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Jahia_contentReportReact_f27caafa-3684-421f-8783-33756790ae7c -Dsonar.projectName='contentReportReact'
+      - name: Check the jar manifest
+        run: |
+          jar=$(ls target/content-reports-react-*.jar | grep -v -- '-sources.jar')
+          if unzip -p "$jar" META-INF/MANIFEST.MF | grep -q 'Jahia-Source-Folders'; then
+            echo "::error::$jar carries Jahia-Source-Folders"; exit 1
+          fi
+      - name: Upload the jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-reports-react
+          path: |
+            target/content-reports-react-*.jar
+            !target/content-reports-react-*-sources.jar

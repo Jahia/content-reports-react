@@ -29,6 +29,7 @@ import org.jahia.modules.contentreports.bean.ReportOverview;
 import org.jahia.modules.contentreports.bean.ReportSiteModules;
 import org.jahia.modules.contentreports.bean.ReportComponentUsage;
 import org.jahia.modules.contentreports.bean.ReportPagesWithoutDescription;
+import org.jahia.modules.contentreports.bean.ReportPartialLanguageVisibility;
 import org.jahia.modules.contentreports.bean.ReportPagesWithoutKeyword;
 import org.jahia.modules.contentreports.bean.ReportPagesWithoutTitle;
 import org.jahia.modules.contentreports.bean.ReportUnreferencedAssets;
@@ -36,12 +37,37 @@ import org.jahia.modules.contentreports.bean.ReportWipContent;
 import org.jahia.modules.contentreports.exception.ContentReportException;
 import org.jahia.services.content.decorator.JCRSiteNode;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 public final class ContentReportFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentReportFactory.class);
+
+    private static final String SEARCH_PATH = "searchPath";
+    private static final String PATH_TXT = "pathTxt";
+    private static final String TYPE_SEARCH = "typeSearch";
+    private static final String TYPE_AUTHOR = "typeAuthor";
+    private static final String CREATED = "created";
+
+    /**
+     * Reports built from the site and, for some, a search path only. Kept out of the switch in
+     * {@link #build}, which handles the reports that read several parameters.
+     */
+    private static final Map<String, BiFunction<JCRSiteNode, Map<String, String>, BaseReport>> SIMPLE_REPORTS = new HashMap<>();
+
+    static {
+        SIMPLE_REPORTS.put("25", (site, params) -> new ReportLiveContents(site, cleanPath(params.get(SEARCH_PATH))));
+        SIMPLE_REPORTS.put("26", (site, params) -> new ReportByExpiredContent(site, cleanPath(params.get(SEARCH_PATH))));
+        SIMPLE_REPORTS.put("27", (site, params) -> new ReportByFutureContent(site, cleanPath(params.get(SEARCH_PATH))));
+        SIMPLE_REPORTS.put("29", (site, params) -> new ReportSiteModules(site));
+        SIMPLE_REPORTS.put("30", (site, params) -> new ReportComponentUsage(site));
+        SIMPLE_REPORTS.put("31", (site, params) -> new ReportPartialLanguageVisibility(site, cleanPath(params.get(SEARCH_PATH))));
+    }
 
     private ContentReportFactory() {
     }
@@ -50,32 +76,37 @@ public final class ContentReportFactory {
                                    Integer sortColumn, String sortDirection) throws ContentReportException {
         Map<String, String> params = parameters != null ? parameters : Collections.emptyMap();
         int sortCol = sortColumn != null ? sortColumn : parseInt(params.get("order[0][column]"), 0);
-        String order = StringUtils.defaultString(sortDirection, params.getOrDefault("order[0][dir]", ""));
+        String order = sortOrderOf(StringUtils.defaultString(sortDirection, params.getOrDefault("order[0][dir]", "")));
+
+        BiFunction<JCRSiteNode, Map<String, String>, BaseReport> simpleReport = SIMPLE_REPORTS.get(reportId);
+        if (simpleReport != null) {
+            return simpleReport.apply(siteNode, params);
+        }
 
         switch (reportId) {
             case "1":
                 return new ReportByAuthor(
                         siteNode,
-                        cleanPath(params.get("pathTxt")),
-                        isPages(params.get("typeSearch")) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT,
-                        isCreated(params.get("typeAuthor")) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE,
+                        cleanPath(params.get(PATH_TXT)),
+                        contentTypeOf(params.get(TYPE_SEARCH)),
+                        actionTypeOf(params.get(TYPE_AUTHOR)),
                         true
                 );
             case "2":
                 return new ReportByAllDate(
                         siteNode,
-                        isCreated(params.get("typeAuthor")) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE,
-                        cleanPath(params.get("pathTxt")),
+                        actionTypeOf(params.get(TYPE_AUTHOR)),
+                        cleanPath(params.get(PATH_TXT)),
                         true
                 );
             case "3":
-                return new ReportBeforeDate(siteNode, cleanPath(params.get("pathTxt")), params.get("date"), true);
+                return new ReportBeforeDate(siteNode, cleanPath(params.get(PATH_TXT)), isoDate(params.get("date")), true);
             case "4":
-                return new ReportByType(siteNode, cleanPath(params.get("pathTxt")));
+                return new ReportByType(siteNode, cleanPath(params.get(PATH_TXT)));
             case "5":
-                return new ReportByTypeDetailed(siteNode, cleanPath(params.get("pathTxt")));
+                return new ReportByTypeDetailed(siteNode, cleanPath(params.get(PATH_TXT)));
             case "6":
-                return new ReportByStatus(siteNode, cleanPath(params.get("pathTxt")));
+                return new ReportByStatus(siteNode, cleanPath(params.get(PATH_TXT)));
             case "7":
                 return new ReportByLanguage(siteNode);
             case "8":
@@ -102,27 +133,22 @@ public final class ContentReportFactory {
                 return new ReportAclInheritanceStopped(siteNode);
             case "20":
                 LOGGER.debug("Building report 20 with params: {}", params);
-                LOGGER.debug("pathTxt raw value: '{}'", params.get("pathTxt"));
-                LOGGER.debug("pathTxt cleaned value: '{}'", cleanPath(params.get("pathTxt")));
                 // Use typeAuthorSearch if typeAuthor is not provided (due to 5-parameter limit)
-                String typeAuthorValue = params.get("typeAuthor");
-                if (typeAuthorValue == null || typeAuthorValue.isEmpty()) {
-                    typeAuthorValue = params.getOrDefault("typeAuthorSearch", "created");
-                }
+                String typeAuthorValue = StringUtils.defaultIfEmpty(params.get(TYPE_AUTHOR), params.getOrDefault("typeAuthorSearch", CREATED));
                 LOGGER.debug("Using typeAuthor value: '{}'", typeAuthorValue);
                 return new ReportByDateAndAuthor(
                         siteNode,
-                        isCreated(typeAuthorValue) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE,
-                        cleanPath(params.get("pathTxt")),
-                        params.getOrDefault("typeSearch", "pages"),
+                        actionTypeOf(typeAuthorValue),
+                        cleanPath(params.get(PATH_TXT)),
+                        params.getOrDefault(TYPE_SEARCH, "pages"),
                         true,
                         Boolean.parseBoolean(params.getOrDefault("searchByDate", "false")),
-                        params.getOrDefault("typeDateSearch", "created"),
-                        params.get("dateBegin"),
-                        params.get("dateEnd"),
+                        params.getOrDefault("typeDateSearch", CREATED),
+                        isoDate(params.get("dateBegin")),
+                        isoDate(params.get("dateEnd")),
                         Boolean.parseBoolean(params.getOrDefault("searchAuthor", "false")),
                         params.get("searchUsername"),
-                        params.getOrDefault("typeAuthorSearch", "created"),
+                        params.getOrDefault("typeAuthorSearch", CREATED),
                         sortCol,
                         order
                 );
@@ -130,14 +156,14 @@ public final class ContentReportFactory {
                 return new ReportByUnstranslated(
                         siteNode,
                         params.get("selectLanguageBU"),
-                        cleanPath(params.get("pathTxt")),
+                        cleanPath(params.get(PATH_TXT)),
                         params.get("selectTypeSearch")
                 );
             case "22":
                 return new ReportWipContent(
                         siteNode,
-                        cleanPath(params.get("pathTxt")),
-                        isPages(params.get("typeSearch")) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT,
+                        cleanPath(params.get(PATH_TXT)),
+                        contentTypeOf(params.get(TYPE_SEARCH)),
                         sortCol,
                         order
                 );
@@ -150,29 +176,49 @@ public final class ContentReportFactory {
             case "24":
                 return new ReportContentMarkedForDeletion(
                         siteNode,
-                        cleanPath(params.get("pathTxt")),
-                        isPages(params.get("typeSearch")) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT,
+                        cleanPath(params.get(PATH_TXT)),
+                        contentTypeOf(params.get(TYPE_SEARCH)),
                         sortCol,
                         order
                 );
-            case "25":
-                return new ReportLiveContents(siteNode, cleanPath(params.get("searchPath")));
-            case "26":
-                return new ReportByExpiredContent(siteNode, cleanPath(params.get("searchPath")));
-            case "27":
-                return new ReportByFutureContent(siteNode, cleanPath(params.get("searchPath")));
             case "28":
                 return new ReportUnreferencedAssets(
                         siteNode,
                         cleanPath(params.get("assetsRootPath"))
                 );
-            case "29":
-                return new ReportSiteModules(siteNode);
-            case "30":
-                return new ReportComponentUsage(siteNode);
             default:
                 throw new ContentReportException("Invalid reportId: " + reportId);
         }
+    }
+
+    /** {@code DESC} when asked for, {@code ASC} otherwise: the value ends an ORDER BY clause. */
+    static String sortOrderOf(String direction) {
+        return "desc".equalsIgnoreCase(StringUtils.trim(direction)) ? "DESC" : "ASC";
+    }
+
+    /**
+     * A date parameter as {@code yyyy-MM-dd}, or an empty string when none was sent; the value is
+     * written into a CAST in the query.
+     *
+     * @throws ContentReportException when the value is not an ISO date
+     */
+    static String isoDate(String value) throws ContentReportException {
+        if (StringUtils.isBlank(value)) {
+            return "";
+        }
+        try {
+            return LocalDate.parse(value.trim()).toString();
+        } catch (DateTimeParseException e) {
+            throw new ContentReportException("Invalid date, expected yyyy-MM-dd");
+        }
+    }
+
+    private static BaseReport.SearchContentType contentTypeOf(String typeSearch) {
+        return isPages(typeSearch) ? BaseReport.SearchContentType.PAGE : BaseReport.SearchContentType.CONTENT;
+    }
+
+    private static BaseReport.SearchActionType actionTypeOf(String typeAuthor) {
+        return isCreated(typeAuthor) ? BaseReport.SearchActionType.CREATION : BaseReport.SearchActionType.UPDATE;
     }
 
     private static boolean isPages(String value) {
@@ -180,7 +226,7 @@ public final class ContentReportFactory {
     }
 
     private static boolean isCreated(String value) {
-        return StringUtils.equalsIgnoreCase(value, "created");
+        return StringUtils.equalsIgnoreCase(value, CREATED);
     }
 
     private static int parseInt(String value, int defaultValue) {

@@ -44,6 +44,7 @@
 package org.jahia.modules.contentreports.bean;
 
 import org.jahia.exceptions.JahiaException;
+import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.json.JSONException;
@@ -75,7 +76,7 @@ public class ReportByAuthorDetailed extends ReportByAuthor {
     public void execute(JCRSessionWrapper session, int offset, int limit) throws RepositoryException, JSONException, JahiaException {
         String strQuery = "SELECT * FROM ";
         strQuery += (reportType.equals(SearchContentType.PAGE) ? "[jnt:page] " : "[jmix:editorialContent] ");
-        strQuery += "AS item WHERE [" + propertyName + "]='" + username + "' AND ISDESCENDANTNODE(item,['" + searchPath + "'])";
+        strQuery += "AS item WHERE [" + propertyName + "]='" + JCRContentUtils.sqlEncode(username) + "' AND ISDESCENDANTNODE(item,['" + searchPath + "'])";
         fillReport(session, strQuery, offset, limit);
     }
 }

@@ -502,12 +502,24 @@ ResultSection.propTypes = {
     t: PropTypes.func.isRequired
 };
 
+// The site and language selected in jContent. contextJsParameters and jahiaGWTParameters hold the
+// site the server resolved for the request (systemsite when sites share the server name
+// localhost, as on Jahia Cloud), not the one the user is browsing.
+const getJContentContext = () => {
+    const state = window.jahia?.reduxStore?.getState?.() || {};
+    const context = window.contextJsParameters || {};
+    return {
+        siteKey: state.site || context.siteKey || context.site?.key || '',
+        language: state.language || context.lang || context.language || '',
+        uilang: state.uilang || context.uilang || ''
+    };
+};
+
 const AdminPanel = ({initialReportId}) => {
     const {t} = useTranslation('contentReportReact');
 
     const context = window.contextJsParameters || {};
-    const siteKey = context.siteKey || (context.site && context.site.key) || '';
-    const language = context.lang || context.language || '';
+    const {siteKey, language, uilang} = getJContentContext();
     const baseContentPath = useMemo(() => (siteKey ? `/sites/${siteKey}` : ''), [siteKey]);
     const graphqlEndpoint = `${context.contextPath || ''}/modules/graphql`;
 
@@ -701,8 +713,8 @@ const AdminPanel = ({initialReportId}) => {
             picker({
                 type: pickerType,
                 initialSelectedItem: [initialPath],
-                site: window.jahiaGWTParameters?.siteKey || siteKey,
-                lang: window.jahiaGWTParameters?.uilang || language || 'en',
+                site: siteKey,
+                lang: uilang || language || 'en',
                 isMultiple: false,
                 setValue: ([selected]) => {
                     console.log('[AdminPanel] Path picker returned:', selected);
@@ -716,7 +728,7 @@ const AdminPanel = ({initialReportId}) => {
         }
 
         console.warn('[contentReportReact] Content Editor picker API is not available.');
-    }, [baseContentPath, handleFieldChange, language, siteKey]);
+    }, [baseContentPath, handleFieldChange, language, siteKey, uilang]);
 
     const getSelectOptions = useCallback(field => {
         if (field.type === 'languageSelect') {

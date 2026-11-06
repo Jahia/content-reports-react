@@ -44,6 +44,7 @@
 package org.jahia.modules.contentreports.bean;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.jahia.exceptions.JahiaException;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -51,9 +52,10 @@ import org.jahia.services.content.decorator.JCRSiteNode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jahia.utils.i18n.Messages;
 
 import javax.jcr.RepositoryException;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.*;
 
 /**
@@ -63,7 +65,6 @@ import java.util.*;
  */
 public class ReportByAllDate extends QueryReport {
 
-    private static final String BUNDLE = "resources.contentReportReact";
     private Map<Integer, Map<Integer, Map<String, Integer>>> dataMap;
     private Boolean useSystemUser;
     private SearchActionType actionType;
@@ -162,7 +163,7 @@ public class ReportByAllDate extends QueryReport {
             for (Integer monthKey : dataMap.get(yearKey).keySet()) {
                 jsonObjectItem = new JSONObject();
                 jsonObjectItem.put("year", yearKey);
-                jsonObjectItem.put("month", Messages.get(BUNDLE, "cgnt_contentReports.month." + monthKey, locale));
+                jsonObjectItem.put("month", StringUtils.capitalize(Month.of(monthKey).getDisplayName(TextStyle.FULL, locale)));
                 jsonObjectItem.put("pages", dataMap.get(yearKey).get(monthKey).get(SearchContentType.PAGE.toString()));
                 jsonObjectItem.put("content", dataMap.get(yearKey).get(monthKey).get(SearchContentType.CONTENT.toString()));
                 /* setting each item to the json object */

@@ -203,25 +203,6 @@ public abstract class QueryReport extends BaseReport {
         return jsonObject;
     }
 
-    /**
-     * Builds the standard JSON response with recordsTotal, recordsFiltered, siteName,
-     * siteDisplayableName and data keys. Subclass getJson() implementations call this
-     * instead of repeating the five-line block.
-     *
-     * @param totalContent number of total/filtered records
-     * @param data         the already-built data array
-     * @return populated {@link JSONObject}
-     * @throws JSONException
-     */
-    protected JSONObject buildJsonResponse(long totalContent, JSONArray data) throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("recordsTotal", totalContent);
-        jsonObject.put("recordsFiltered", totalContent);
-        jsonObject.put("siteName", siteNode.getName());
-        jsonObject.put("siteDisplayableName", siteNode.getDisplayableName());
-        jsonObject.put("data", data);
-        return jsonObject;
-    }
 
 
 

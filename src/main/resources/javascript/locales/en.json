@@ -42,6 +42,7 @@
       "liveContents": "Live visibility conditions",
       "expiredContents": "Expired content",
       "futureContents": "Scheduled content",
+      "partialLanguageVisibility": "Displayed in some languages only",
       "usersGroups": "Report Users & Groups"
     },
     "descriptions": {
@@ -64,6 +65,7 @@
       "liveContents": "View content with live visibility conditions. This report displays content that has conditional visibility rules applied, showing the conditions, matching status, and current visibility state.",
       "expiredContents": "View content with expired visibility conditions. This report identifies content that has visibility end dates that have already passed, making the content no longer visible on the live site.",
       "futureContents": "View content scheduled to go live in the future. This report shows content with visibility start dates that have not yet been reached, allowing you to preview upcoming content publications.",
+      "partialLanguageVisibility": "View pages and content that editors switched off in some of the site's languages (Visibility > Languages in Content Editor). Page Builder still shows them in every language; preview and the live site leave them out in the languages listed as hidden.",
       "pagesWithoutKeywords": "Identify pages that are missing SEO keywords. This report helps you find pages that need keyword metadata for better search engine optimization.",
       "pagesWithoutDescription": "Identify pages that are missing descriptions in one or more languages. The report displays the path and shows which languages have descriptions defined for better SEO and accessibility.",
       "usersGroups": "Generate a CSV report of all Jahia users across all sites, including their group memberships. Reports are stored in JCR and can be downloaded directly from this page."
@@ -268,6 +270,15 @@
           "path": "Path",
           "type": "Type",
           "liveDate": "Live Date"
+        }
+      },
+      "partialLanguageVisibility": {
+        "columns": {
+          "title": "Title",
+          "path": "Path",
+          "type": "Type",
+          "displayedIn": "Displayed in",
+          "hiddenIn": "Hidden in"
         }
       },
       "pagesWithoutKeywords": {
